@@ -26,11 +26,10 @@ pub fn verify_json(String, String, String) -> String
 pub suberror InputError {
   InputError(String)
 } derive(@debug.Debug)
+pub fn InputError::to_repr(Self) -> @debug.Repr
 pub fn InputError::to_string(Self) -> String
 
 // Types and methods
-type Derived derive(@debug.Debug)
-
 pub(all) struct Evidence {
   id : String
   group : String
@@ -40,11 +39,9 @@ pub(all) struct Evidence {
   excluded_row_ids : Array[Int]
   values : Array[Double]
 } derive(@debug.Debug)
+pub fn Evidence::to_json(Self) -> Json
+pub fn Evidence::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Evidence
-
-type Filter derive(@debug.Debug)
-
-type Plan derive(@debug.Debug)
 
 pub(all) struct Report {
   engine_version : String
@@ -61,11 +58,16 @@ pub(all) struct Report {
   evidence : Array[Evidence]
   warnings : Array[String]
 } derive(ToJson, @debug.Debug)
+pub fn Report::to_json(Self) -> Json
+pub fn Report::to_repr(Self) -> @debug.Repr
 
 pub(all) struct Table {
   headers : Array[String]
   rows : Array[Array[String]]
 } derive(Eq, @debug.Debug)
+pub fn Table::equal(Self, Self) -> Bool
+pub fn Table::not_equal(Self, Self) -> Bool
+pub fn Table::to_repr(Self) -> @debug.Repr
 
 // Type aliases
 

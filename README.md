@@ -12,7 +12,7 @@ Published on [Mooncakes](https://mooncakes.io/docs/FidollarinLA/retrace). Add wi
 
 ## Try it
 
-Requires MoonBit 0.10.13+, Node.js 22+, Python 3.10+ for the independent reference suite. There are **no npm or third-party MoonBit runtime dependencies**.
+Requires MoonBit 0.10.14+ (verification and formatting use 0.10.14), Node.js 22+, Python 3.10+ for the independent reference suite. There are **no npm or third-party MoonBit runtime dependencies**.
 
 ```sh
 git clone https://github.com/FidollarinLA/retrace.git

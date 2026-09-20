@@ -5,28 +5,37 @@ pub suberror InputError {
 } derive(Debug)
 
 ///|
+pub extend InputError with @debug.Debug::{to_repr}
+
+///|
 pub(all) struct Table {
   headers : Array[String]
   rows : Array[Array[String]]
 } derive(Debug, Eq)
 
 ///|
-struct Filter {
+pub extend Table with @debug.Debug::{to_repr}
+
+///|
+pub extend Table with Eq::{equal, not_equal}
+
+///|
+priv struct Filter {
   column : String
   op : String
   value : String
-} derive(Debug)
+}
 
 ///|
-struct Derived {
+priv struct Derived {
   name : String
   op : String
   left : String
   right : String
-} derive(Debug)
+}
 
 ///|
-struct Plan {
+priv struct Plan {
   title : String
   metric : String
   operation : String
@@ -35,7 +44,7 @@ struct Plan {
   missing : String
   filters : Array[Filter]
   derived : Array[Derived]
-} derive(Debug)
+}
 
 ///|
 pub(all) struct Evidence {
@@ -47,6 +56,12 @@ pub(all) struct Evidence {
   excluded_row_ids : Array[Int]
   values : Array[Double]
 } derive(Debug)
+
+///|
+pub extend Evidence with @debug.Debug::{to_repr}
+
+///|
+pub extend Evidence with ToJson::{to_json}
 
 ///|
 pub(all) struct Report {
@@ -64,6 +79,12 @@ pub(all) struct Report {
   evidence : Array[Evidence]
   warnings : Array[String]
 } derive(Debug, ToJson)
+
+///|
+pub extend Report with @debug.Debug::{to_repr}
+
+///|
+pub extend Report with ToJson::{to_json}
 
 ///|
 fn finite(value : Double) -> Bool {

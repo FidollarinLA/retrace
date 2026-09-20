@@ -6,6 +6,8 @@ Natural-language planning through a user-chosen model, copied prompt or local CL
 
 Preserve detailed input error messages at the JSON API boundary. Add bounded model-response streaming, reject credential-bearing URLs and redirects. Recompute 0.1.1 report bundles under the unchanged numeric contract, checking all fields except the expected engine-version change. Validate with 20 MoonBit tests per target, 26 integration checks and 560 independent reference scenarios. Live-provider and browser interaction acceptance remain pending.
 
+Declare public trait extensions explicitly and mark internal plan types private for MoonBit 0.10.14. The checked-in browser engine is compiled with that version.
+
 ## 0.1.1 — 2026-09-20
 
 Use the constructor spelling supported by current MoonBit; fix CI installation to use the official distribution. Bundle engine version is now 0.1.1; old bundles must be regenerated from their CSV and plan.
