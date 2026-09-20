@@ -7332,7 +7332,7 @@ function _M0FP312FidollarinLA7retrace6engine14analyze__table(csv, plan_json) {
       break;
     }
   }
-  return new _M0DTPC16result6ResultGRP312FidollarinLA7retrace6engine6ReportRP312FidollarinLA7retrace6engine10InputErrorE2Ok(new _M0TP312FidollarinLA7retrace6engine6Report("0.1.0", 1, plan.title, plan.metric, plan.operation, plan.group_by, plan.unit, plan.missing, table.rows.length, matched_rows, filtered, evidence, warnings));
+  return new _M0DTPC16result6ResultGRP312FidollarinLA7retrace6engine6ReportRP312FidollarinLA7retrace6engine10InputErrorE2Ok(new _M0TP312FidollarinLA7retrace6engine6Report("0.1.1", 1, plan.title, plan.metric, plan.operation, plan.group_by, plan.unit, plan.missing, table.rows.length, matched_rows, filtered, evidence, warnings));
 }
 function _M0FP312FidollarinLA7retrace6engine12verify__json(csv, plan_text, draft_text) {
   let _try_err;

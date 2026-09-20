@@ -4,7 +4,11 @@
 
 ReTrace is an open-source MoonBit engine for recomputable data reports. CSV + a versioned analysis plan produce deterministic statistics, record-level evidence and a replayable report bundle. Optional AI-generated numeric claims are checked against a fresh execution before use.
 
-> 0.1.0 is a working prototype for the September 2026 MoonBit Hackathon. All included datasets are synthetic. It does not certify data authenticity, causal conclusions or engineering compliance.
+> 0.1.1 is a working prototype for the September 2026 MoonBit Hackathon. All included datasets are synthetic. It does not certify data authenticity, causal conclusions or engineering compliance.
+
+## Package
+
+Published on [Mooncakes](https://mooncakes.io/docs/FidollarinLA/retrace). Add with `moon add FidollarinLA/retrace`, then import `FidollarinLA/retrace/engine`.
 
 ## Try it
 

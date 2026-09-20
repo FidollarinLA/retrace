@@ -53,7 +53,7 @@ try {
     await writeFile(args[1], reportHTML(r.bundle));
   } else {
     console.log(
-      "ReTrace 0.1.0\n\nnode scripts/cli.mjs analyze input.csv plan.json [bundle.json]\nnode scripts/cli.mjs replay bundle.json\nnode scripts/cli.mjs verify bundle.json draft.json\nnode scripts/cli.mjs prompt bundle.json\nnode scripts/cli.mjs html bundle.json report.html",
+      "ReTrace 0.1.1\n\nnode scripts/cli.mjs analyze input.csv plan.json [bundle.json]\nnode scripts/cli.mjs replay bundle.json\nnode scripts/cli.mjs verify bundle.json draft.json\nnode scripts/cli.mjs prompt bundle.json\nnode scripts/cli.mjs html bundle.json report.html",
     );
     if (command && command !== "--help") process.exitCode = 1;
   }

@@ -142,7 +142,7 @@ pub fn analyze_table(csv : String, plan_json : Json) -> Report raise InputError 
     })
   }
   {
-    engine_version: "0.1.0",
+    engine_version: "0.1.1",
     schema_version: 1,
     title: plan.title,
     metric: plan.metric,

@@ -60,6 +60,6 @@ The JSON API returns `{"ok":false,"error":"..."}` for malformed inputs; a well-f
 
 ## Bundle and replay
 
-`format: retrace-bundle`, `schema_version: 1`, `engine_version: 0.1.0`, `csv`, `plan`, `report`, `fingerprint`. SHA-256 input is UTF-8 encoded canonical JSON of `{csv,plan}` with recursively sorted object keys and preserved array order. The exact CSV text is included, so newline changes can change the hash. Metadata ordering does not.
+`format: retrace-bundle`, `schema_version: 1`, `engine_version: 0.1.1`, `csv`, `plan`, `report`, `fingerprint`. SHA-256 input is UTF-8 encoded canonical JSON of `{csv,plan}` with recursively sorted object keys and preserved array order. The exact CSV text is included, so newline changes can change the hash. Metadata ordering does not.
 
 Replay validates versions, recomputes the report and separately checks the input fingerprint and canonical saved-report equality. No migrations or cross-version reproducibility claims are made. Fresh bundles clone plans so later caller mutations do not change the stored snapshot.

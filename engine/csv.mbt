@@ -9,7 +9,7 @@ pub fn parse_csv(text : String) -> Table raise InputError {
   let chars = text.iter().to_array()
   let records : Array[Array[String]] = []
   let mut row : Array[String] = []
-  let mut buffer = StringBuilder::new()
+  let mut buffer = StringBuilder()
   let mut quoted = false
   let mut closed = false
   let mut touched = false
@@ -30,7 +30,7 @@ pub fn parse_csv(text : String) -> Table raise InputError {
       }
     } else if c == ',' {
       row.push(buffer.to_string())
-      buffer = StringBuilder::new()
+      buffer = StringBuilder()
       closed = false
       touched = true
     } else if c == '\n' || c == '\r' {
@@ -39,7 +39,7 @@ pub fn parse_csv(text : String) -> Table raise InputError {
         records.push(row)
       }
       row = []
-      buffer = StringBuilder::new()
+      buffer = StringBuilder()
       closed = false
       touched = false
       if c == '\r' && i + 1 < chars.length() && chars[i + 1] == '\n' {

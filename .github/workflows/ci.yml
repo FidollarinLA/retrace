@@ -22,6 +22,7 @@ jobs:
           python-version: "3.12"
       - name: MoonBit checks and tests
         run: |
+          moon version --all
           moon check --deny-warn
           moon test --target js --deny-warn
           moon test --target wasm-gc --deny-warn

@@ -1,5 +1,5 @@
 import { analyze, verify } from "./engine.js";
-export const ENGINE_VERSION = "0.1.0";
+export const ENGINE_VERSION = "0.1.1";
 export function compute(csv, plan) {
   const result = JSON.parse(analyze(csv, JSON.stringify(plan)));
   if (!result.ok) throw new Error(result.error);
@@ -59,7 +59,7 @@ export async function replay(bundle) {
     typeof bundle.fingerprint !== "string"
   )
     throw new Error(
-      "不支持的报告包或引擎版本。需要 ReTrace 0.1.0 / schema 1。",
+      "不支持的报告包或引擎版本。需要 ReTrace 0.1.1 / schema 1。",
     );
   const fresh = await createBundle(bundle.csv, bundle.plan);
   return {
