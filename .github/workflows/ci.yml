@@ -12,10 +12,10 @@ jobs:
       - uses: moonbitlang/setup-moonbit@v1
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: "24"
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
       - name: MoonBit checks and tests
         run: |
           moon check --deny-warn

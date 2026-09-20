@@ -9,5 +9,7 @@
     "start": "node scripts/server.mjs",
     "reference": "python3 scripts/reference_check.py"
   },
-  "engines": {"node": ">=22"}
+  "engines": {
+    "node": ">=22"
+  }
 }
