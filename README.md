@@ -24,6 +24,8 @@ npm start
 
 The checked-in `dist/` also runs as a static website without a compiler or API key. The actual computation is generated from the MoonBit source under `engine/`; JavaScript supplies browser, file and network I/O.
 
+For a ready-to-run static copy, download the [0.2.1 demo ZIP](https://github.com/FidollarinLA/retrace/releases/download/v0.2.1/retrace-demo-0.2.1.zip), extract it, run `python3 -m http.server 4173` in the extracted folder and open `http://localhost:4173`.
+
 Pure MoonBit example:
 
 ```sh
