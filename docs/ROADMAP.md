@@ -27,9 +27,9 @@ The scope is a data report engine; a general BI suite, online motor monitoring s
 ## Verified publication — 2026-09-20
 
 - [Source and project](https://github.com/FidollarinLA/retrace) — default branch `codex/retrace-v0.1`.
-- [0.2.1 prerelease](https://github.com/FidollarinLA/retrace/releases/tag/v0.2.1) — downloadable browser demo with plan/result comparison.
-- [Passing release CI](https://github.com/FidollarinLA/retrace/actions/runs/35536030166) — MoonBit 0.10.14, 20 tests per target, 30 integration checks and 560 reference scenarios.
+- [0.2.2 prerelease](https://github.com/FidollarinLA/retrace/releases/tag/v0.2.2) — downloadable browser demo with plan/result comparison and Chinese error guidance.
+- [Passing release CI](https://github.com/FidollarinLA/retrace/actions/runs/35536673832) — MoonBit 0.10.14, 20 tests per target, 31 integration checks and 560 reference scenarios.
 - [Mooncakes package](https://mooncakes.io/docs/FidollarinLA/retrace) — 0.2.0.
-- [Owner-private live demo](https://retrace-data-lab.ivory-crow-7577.chatgpt.site) — 0.2.1 interface deployed; account access required. Judges can use the public downloadable demo.
+- [Owner-private live demo](https://retrace-data-lab.ivory-crow-7577.chatgpt.site) — 0.2.2 interface deployed; account access required. Judges can use the public downloadable demo.
 
 Official application is **not submitted**. Project name and repository URL were entered in the Feishu form; required personal details, a proposal complying with the form's authorship rule, and event-group participation remain unverified. This is not acceptance by the contest.
