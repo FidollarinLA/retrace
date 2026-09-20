@@ -16,6 +16,10 @@ pub fn inspect_json(String) -> String
 
 pub fn parse_csv(String) -> Table raise InputError
 
+pub fn trace_json(String, String, String) -> String
+
+pub fn trace_table(String, Json, Int, Int, String, String) -> Json raise InputError
+
 pub fn verify_json(String, String, String) -> String
 
 // Errors

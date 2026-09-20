@@ -142,7 +142,7 @@ pub fn analyze_table(csv : String, plan_json : Json) -> Report raise InputError 
     })
   }
   {
-    engine_version: "0.1.1",
+    engine_version: "0.2.0",
     schema_version: 1,
     title: plan.title,
     metric: plan.metric,
@@ -167,7 +167,7 @@ pub fn analyze_json(csv : String, plan : String) -> String {
     response.stringify()
   } catch {
     error => {
-      let response : Json = { "ok": false, "error": error.to_string() }
+      let response : Json = { "ok": false, "error": input_error_message(error) }
       response.stringify()
     }
   }
@@ -181,7 +181,7 @@ pub fn inspect_json(csv : String) -> String {
     response.stringify()
   } catch {
     error => {
-      let response : Json = { "ok": false, "error": error.to_string() }
+      let response : Json = { "ok": false, "error": input_error_message(error) }
       response.stringify()
     }
   }

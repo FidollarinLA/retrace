@@ -4,7 +4,7 @@
 
 ReTrace is an open-source MoonBit engine for recomputable data reports. CSV + a versioned analysis plan produce deterministic statistics, record-level evidence and a replayable report bundle. Optional AI-generated numeric claims are checked against a fresh execution before use.
 
-> 0.1.1 is a working prototype for the September 2026 MoonBit Hackathon. All included datasets are synthetic. It does not certify data authenticity, causal conclusions or engineering compliance.
+> 0.2.0 is a working prototype for the September 2026 MoonBit Hackathon. All included datasets are synthetic. It does not certify data authenticity, causal conclusions or engineering compliance.
 
 ## Package
 
@@ -12,7 +12,7 @@ Published on [Mooncakes](https://mooncakes.io/docs/FidollarinLA/retrace). Add wi
 
 ## Try it
 
-Requires MoonBit 0.10.7+ (tested locally with 0.10.7 and 0.10.13; formatting uses 0.10.13), Node.js 22+, Python 3.10+ for the independent reference suite. There are **no npm or third-party MoonBit runtime dependencies**.
+Requires MoonBit 0.10.13+, Node.js 22+, Python 3.10+ for the independent reference suite. There are **no npm or third-party MoonBit runtime dependencies**.
 
 ```sh
 git clone https://github.com/FidollarinLA/retrace.git
@@ -35,9 +35,12 @@ moon run cmd/retrace
 - Read quoted CSV with Unicode, BOM, CRLF, embedded commas/newlines and escaped quotes. Reject duplicate headers and ragged records.
 - Execute a strict version-1 analysis plan: AND filters, sequential derived columns, grouping, sum / mean / median / min / max / sample standard deviation / valid numeric count.
 - Trace results to one-based source data-record IDs, included values, explicitly excluded missing values and filtered rows.
+- Open the original records behind a chart, with included / missing / filtered states, derived cells, pagination and original CSV download. Parsing and record classification run in MoonBit.
+- Turn a natural-language question into a proposed Plan v1 using your chosen model. Inspect the metric, filters, missing policy, units and trial execution before explicitly applying it.
 - Inspect three scenarios using the **same engine**: regional sales, laboratory measurements and motor temperature rise.
 - Export standalone HTML or a JSON bundle containing the CSV, plan, engine version, calculated results and a SHA-256 input fingerprint.
 - Import a bundle and recompute; flag changed inputs, changed saved results and unsupported versions.
+- Recompute existing 0.1.1 bundles under 0.2.0 and export an upgraded bundle. Every saved result field is checked, with only the declared engine version normalized.
 - Check AI claims for exact numeric equality, evidence reference and unit. The browser includes a correct fixture and deliberately corrupted fixture, both clearly labeled as tests.
 
 ## Command line
@@ -54,6 +57,15 @@ Exit status: `0` success, `1` malformed input/runtime error, `2` reproducibility
 
 ## Optional AI integration
 
+Click **用一句话分析** to describe a question. Copy its schema prompt to an AI and paste the returned JSON, or expand the optional model settings and supply a chat-completions endpoint, model name and API key. Direct browser calls require provider CORS support; a hosted HTTPS page may block a local HTTP endpoint. Keys are never persisted and are cleared when the dialog closes. The planner sends the question, column names and numeric/missing counts, **not source records**. Questions and column names can themselves contain sensitive information. Model plans are proposals: a successful validation does not prove they match the user's intent.
+
+Local planning CLI (avoids browser CORS restrictions):
+
+```sh
+node scripts/plan.mjs examples/sales.csv '按区域求销售额合计，单位元' proposal.json
+# Review proposal.json before running analysis with it.
+```
+
 The demo's **AI 核验台** copies a prompt containing aggregate evidence. Paste it into your chosen AI and paste its JSON answer back. No provider credentials are required for this workflow. Copying a prompt does not make a network request.
 
 For an automated chat-completions-compatible endpoint (including a local model):
@@ -65,9 +77,9 @@ export RETRACE_AI_MODEL='your-installed-model'
 node scripts/ai.mjs report.json draft.json
 ```
 
-The adapter sends metric context and aggregate evidence, **not the raw CSV**. It recomputes the bundle before the request and verifies the response afterward. Keys are read from environment variables, never stored in reports or browser storage. Hosted external providers may charge according to your account; ReTrace has no bundled model subscription.
+The claim adapter sends metric context and aggregate evidence, **not the raw CSV**. It recomputes the bundle before the request and verifies the response afterward. CLI keys are read from environment variables, never stored in reports or browser storage. The planning CLI uses the same environment variables. Hosted external providers may charge according to your account; ReTrace has no bundled model subscription.
 
-The adapter is tested with deterministic mock responses. **No live external model was used to validate the initial release.** Computed report prose is a deterministic template, not disguised model output.
+Both adapters are tested with deterministic mock responses. **No live external model was used to validate 0.2.0.** Computed report prose is a deterministic template, not disguised model output.
 
 ## Verification
 
@@ -81,7 +93,7 @@ npm run reference
 moon info && moon fmt
 ```
 
-Initial validation: 15 MoonBit tests on each of JS and Wasm-GC, 16 integration checks, and 560 seeded Python-reference scenarios containing 1,673 aggregate/provenance comparisons. The independent oracle uses Python `statistics`, `math.fsum` and `csv`, without importing application logic. These are correctness tests, not evidence of real-world diagnostic accuracy.
+0.2.0 validation: 20 MoonBit tests on each of JS and Wasm-GC, 26 integration checks, and 560 seeded Python-reference scenarios containing 1,673 aggregate/provenance comparisons. The independent oracle uses Python `statistics`, `math.fsum` and `csv`, without importing application logic. These are correctness tests, not evidence of real-world diagnostic accuracy. Browser interaction, mobile layout and live-provider acceptance remain unverified.
 
 ## Architecture
 
@@ -115,7 +127,7 @@ Read [the analysis contract](docs/SCHEMA.md) and [known limitations](docs/LIMITA
 - `count` counts valid numeric observations, not all records. `stddev` uses denominator `n−1` and returns `null` below two observations. Empty groups return `null`, never a fabricated zero.
 - Claims require the full computed IEEE-754 value. Rounded natural-language statements need to be converted to structured exact claims; arbitrary prose is not verified.
 - A checksum proves consistency with the stored input, not its authenticity. A bundle's hash can be recomputed by anyone who modifies it.
-- Browser workflows do not upload data or use analytics. Exported bundles contain the raw CSV: share them intentionally.
+- CSV computation does not upload source records or use analytics. Explicit model requests share the displayed prompt context with the chosen provider. Exported bundles contain the raw CSV: share them intentionally.
 
 ## Originality and license
 

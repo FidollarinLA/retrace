@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.0 — 2026-09-20
+
+Natural-language planning through a user-chosen model, copied prompt or local CLI, followed by strict MoonBit validation and explicit review before application. Source-record inspection now shows original and derived cells, included/missing/filtered states, evidence scoping and pagination; original CSV is downloadable.
+
+Preserve detailed input error messages at the JSON API boundary. Add bounded model-response streaming, reject credential-bearing URLs and redirects. Recompute 0.1.1 report bundles under the unchanged numeric contract, checking all fields except the expected engine-version change. Validate with 20 MoonBit tests per target, 26 integration checks and 560 independent reference scenarios. Live-provider and browser interaction acceptance remain pending.
+
 ## 0.1.1 — 2026-09-20
 
 Use the constructor spelling supported by current MoonBit; fix CI installation to use the official distribution. Bundle engine version is now 0.1.1; old bundles must be regenerated from their CSV and plan.

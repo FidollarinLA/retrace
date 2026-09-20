@@ -9,3 +9,4 @@ output/
 .openai/*.local.*
 
 docs/WORKLOG.md
+.local/

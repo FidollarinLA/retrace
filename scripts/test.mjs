@@ -1,5 +1,13 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
+import { readFile } from "node:fs/promises";
+import {
+  planningPrompt,
+  validateProposal,
+  requestPlan,
+  requestJSON,
+  traceRecords,
+} from "../dist/planner.js";
 import {
   createBundle,
   replay,
@@ -189,5 +197,170 @@ await test("large claims cannot hide meaningful errors in relative tolerance", (
     { claims: [{ evidence_id: "e1", value: 1000000000100 }] },
   );
   assert(!r.all_passed);
+});
+await test("0.1.1 golden bundle upgrades while all saved evidence is checked", async () => {
+  const old = JSON.parse(
+    await readFile(
+      new URL("../tests/fixtures/bundle-0.1.1.json", import.meta.url),
+      "utf8",
+    ),
+  );
+  const result = await replay(old);
+  assert(result.upgraded && result.source_matches && result.report_matches);
+  assert.equal(result.bundle.engine_version, "0.2.0");
+  old.report.evidence[0].row_ids.reverse();
+  assert(!(await replay(old)).report_matches);
+});
+await test("planning prompt exposes column summaries but no source values", () => {
+  const prompt = planningPrompt(
+    "region,revenue,customer\nEast,123456,PRIVATE_CUSTOMER",
+    "按 region 计算 revenue 的合计",
+  );
+  assert(prompt.includes("revenue") && prompt.includes("numeric"));
+  assert(!prompt.includes("PRIVATE_CUSTOMER") && !prompt.includes("123456"));
+  assert.throws(() => planningPrompt(examples.sales.csv, ""));
+  assert.throws(() => planningPrompt(examples.sales.csv, "x".repeat(4001)));
+});
+await test("planning adapter validates the proposal without changing caller data", async () => {
+  const original = structuredClone(examples.sales);
+  let sent;
+  const result = await requestPlan(original.csv, "按区域求销售额合计，单位元", {
+    endpoint: "https://models.example/v1/chat/completions",
+    model: "mock",
+    apiKey: "test-only",
+    fetchImpl: async (_, options) => {
+      sent = JSON.parse(options.body);
+      assert.equal(options.redirect, "error");
+      return Response.json({
+        choices: [
+          { message: { content: JSON.stringify(examples.sales.plan) } },
+        ],
+      });
+    },
+  });
+  assert.equal(result.report.evidence[0].value, 166000);
+  assert(!canonical(sent).includes("42000"));
+  result.plan.metric = "modified";
+  assert.deepEqual(original, examples.sales);
+});
+await test("proposal accepts fenced JSON and rejects hallucinated or executable fields", () => {
+  const { csv, plan } = examples.sales;
+  assert.equal(
+    validateProposal(csv, "```json\n" + JSON.stringify(plan) + "\n```").report
+      .evidence[0].value,
+    166000,
+  );
+  for (const bad of [
+    { ...plan, metric: "imaginary" },
+    { ...plan, operation: "forecast" },
+    { ...plan, code: "alert(1)" },
+    { ...plan, filters: [{ column: plan.metric, op: "eval", value: "1" }] },
+  ])
+    assert.throws(() => validateProposal(csv, bad));
+  assert.throws(
+    () => validateProposal(csv, { error: "你指的是哪一列？" }),
+    /需要澄清/,
+  );
+});
+await test("proposal cannot silently bypass missing values or derived errors", () => {
+  assert.throws(
+    () => validateProposal("v,n\n,1", { schema_version: 1, metric: "v" }),
+    /missing/,
+  );
+  assert.throws(
+    () =>
+      validateProposal("a,b\n1,0", {
+        schema_version: 1,
+        metric: "ratio",
+        derived: [{ name: "ratio", op: "divide", left: "a", right: "b" }],
+      }),
+    /division by zero/,
+  );
+});
+await test("model requests reject unsafe transports before network access", async () => {
+  let calls = 0;
+  for (const endpoint of [
+    "http://models.example/v1",
+    "https://user:password@models.example/v1",
+    "file:///tmp/model",
+  ])
+    await assert.rejects(() =>
+      requestJSON("test", {
+        endpoint,
+        model: "test",
+        fetchImpl: () => {
+          calls++;
+        },
+      }),
+    );
+  assert.equal(calls, 0);
+});
+await test("model adapter rejects invalid shapes, oversized streams and errors", async () => {
+  const options = { endpoint: "https://models.example/v1", model: "test" };
+  for (const response of [
+    Response.json({ choices: [] }),
+    new Response("x".repeat(1000001)),
+    new Response("secret", { status: 403 }),
+  ]) {
+    await assert.rejects(
+      () =>
+        requestJSON("test", { ...options, fetchImpl: async () => response }),
+      (error) => !error.message.includes("secret"),
+    );
+  }
+});
+await test("source records agree with all example evidence including missing rows", () => {
+  for (const e of Object.values(examples)) {
+    const report = compute(e.csv, e.plan);
+    const page = traceRecords(e.csv, e.plan, { limit: 100 });
+    assert.equal(page.total, report.source_rows);
+    for (const evidence of report.evidence) {
+      const scoped = traceRecords(e.csv, e.plan, {
+        limit: 100,
+        evidence_id: evidence.id,
+      });
+      assert.deepEqual(
+        scoped.records.filter((x) => x.status === "included").map((x) => x.id),
+        evidence.row_ids,
+      );
+      assert.deepEqual(
+        scoped.records.filter((x) => x.status === "missing").map((x) => x.id),
+        evidence.excluded_row_ids,
+      );
+    }
+    assert.deepEqual(
+      page.records.filter((x) => x.status === "filtered").map((x) => x.id),
+      report.filtered_row_ids,
+    );
+  }
+});
+await test("trace pagination does not skip or repeat record IDs", () => {
+  const csv =
+    "value\n" + Array.from({ length: 61 }, (_, i) => String(i + 1)).join("\n");
+  const plan = {
+    schema_version: 1,
+    metric: "value",
+    filters: [{ column: "value", op: "gte", value: 3 }],
+  };
+  const ids = [0, 25, 50].flatMap((offset) =>
+    traceRecords(csv, plan, {
+      offset,
+      limit: 25,
+      status: "included",
+    }).records.map((x) => x.id),
+  );
+  assert.deepEqual(
+    ids,
+    Array.from({ length: 59 }, (_, i) => i + 3),
+  );
+  assert.throws(() => traceRecords(csv, plan, { offset: 0.5 }));
+});
+await test("trace keeps multiline cells and original number spelling", () => {
+  const page = traceRecords('v,note\n010,"first\nsecond"', {
+    schema_version: 1,
+    metric: "v",
+  });
+  assert.deepEqual(page.records[0].cells, ["010", "first\nsecond"]);
+  assert.equal(page.records[0].id, 1);
 });
 console.log(`${tests} integration checks passed.`);

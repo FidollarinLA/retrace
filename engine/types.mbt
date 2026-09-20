@@ -146,6 +146,14 @@ pub fn InputError::to_string(self : InputError) -> String {
 }
 
 ///|
+fn input_error_message(error : Error) -> String {
+  match error {
+    InputError(message) => message
+    _ => "Invalid JSON input: \{error.to_string()}"
+  }
+}
+
+///|
 pub impl ToJson for Evidence with fn to_json(self) {
   let value : Json = match self.value {
     Some(n) => n.to_json()

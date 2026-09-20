@@ -38,7 +38,7 @@
       </nav>
       <div class="sidebar-note">
         <span class="tiny-label">LOCAL FIRST</span>
-        <p>数据在当前浏览器中计算。<br />无需上传到服务器。</p>
+        <p>数据在当前浏览器中计算。<br />仅主动使用 AI 时发送提示词。</p>
         <small>示例均为合成数据。</small>
       </div>
       <a
@@ -52,7 +52,7 @@
     <div class="workspace">
       <header class="topbar">
         <div>工作空间 <span>/</span> 报告实验室</div>
-        <span class="engine-tag">MoonBit 计算引擎 <b>v0.1</b></span>
+        <span class="engine-tag">MoonBit 计算引擎 <b>v0.2</b></span>
       </header>
       <main>
         <div class="title-row">
@@ -64,6 +64,7 @@
             </p>
           </div>
           <div class="actions">
+            <button id="open-planner" class="button dark">用一句话分析</button>
             <button id="open-data" class="button">导入 / 编辑数据</button
             ><button id="export-bundle" class="button primary">
               导出报告包 <span>↓</span>
@@ -176,6 +177,13 @@
                 <span id="evidence-id" class="mono"></span>
               </div>
               <div id="evidence"></div>
+              <div class="record-actions">
+                <button id="evidence-records" class="button">
+                  查看这条证据的原始记录</button
+                ><button id="open-records" class="text-button">
+                  全部源记录
+                </button>
+              </div>
             </section>
           </div>
           <section class="panel findings">
@@ -263,6 +271,97 @@
       <div class="dialog-actions">
         <span id="plan-error" class="error" role="alert"></span
         ><button id="apply-plan" class="button primary">应用并复算</button>
+      </div>
+    </dialog>
+    <dialog id="planner-dialog">
+      <form method="dialog" class="dialog-head">
+        <h2>用一句话分析</h2>
+        <button aria-label="关闭">×</button>
+      </form>
+      <p>描述问题 → 生成配置 → 审阅并应用。数据计算始终在本地完成。</p>
+      <label for="analysis-question">你想了解什么？</label>
+      <textarea
+        id="analysis-question"
+        rows="3"
+        maxlength="4000"
+        placeholder="例如：按区域计算销售额合计，单位元，遇到缺失值先停止。"
+      ></textarea>
+      <div class="ai-actions">
+        <button id="copy-plan-prompt" class="button">
+          复制提示词到我的 AI
+        </button>
+      </div>
+      <div id="planning-prompt-container" hidden>
+        <label for="planning-prompt"
+          >提示词（只含问题、列名及数值 / 缺失数量）</label
+        ><textarea id="planning-prompt" rows="6" readonly></textarea>
+      </div>
+      <details class="model-settings">
+        <summary>直接连接自己的模型（可选）</summary>
+        <p>
+          点击生成后，会向下方接口发送你的问题、列名和列的数值 /
+          缺失数量，不发送原始记录。密钥仅用于本次页面请求，关闭对话框即清空。接口需支持浏览器跨域访问。
+        </p>
+        <label for="model-endpoint">完整 Chat Completions 接口地址</label
+        ><input
+          id="model-endpoint"
+          type="url"
+          placeholder="https://你的服务/v1/chat/completions"
+          autocomplete="off"
+        />
+        <label for="model-name">模型名称</label
+        ><input id="model-name" autocomplete="off" />
+        <label for="model-key">API 密钥（本地模型可留空）</label
+        ><input id="model-key" type="password" autocomplete="off" />
+        <button id="generate-plan" class="button dark">
+          发送问题并生成配置
+        </button>
+      </details>
+      <label for="proposal-editor">AI 返回的配置 JSON（可以手动修改）</label
+      ><textarea id="proposal-editor" rows="8" spellcheck="false"></textarea>
+      <button id="preview-proposal" class="button">校验并预览配置</button>
+      <div id="planner-result" role="status" aria-live="polite"></div>
+      <div id="proposal-preview"></div>
+      <div class="dialog-actions">
+        <button id="confirm-proposal" class="button primary" disabled>
+          确认配置，应用到报告
+        </button>
+      </div>
+    </dialog>
+    <dialog id="records-dialog" class="wide-dialog">
+      <form method="dialog" class="dialog-head">
+        <h2>原始记录与计算依据</h2>
+        <button aria-label="关闭">×</button>
+      </form>
+      <p>
+        记录编号不包含表头。派生列单独标记；选择“全部源记录”可检查被筛选掉的数据。
+      </p>
+      <div class="records-controls">
+        <label for="record-scope">范围</label
+        ><select id="record-scope"></select
+        ><label for="record-status">状态</label
+        ><select id="record-status">
+          <option value="all">全部状态</option>
+          <option value="included">参与计算</option>
+          <option value="missing">缺失排除</option>
+          <option value="filtered">筛选排除</option></select
+        ><button id="download-source" class="text-button">
+          下载原始 CSV ↓
+        </button>
+      </div>
+      <div
+        class="table-scroll"
+        tabindex="0"
+        role="region"
+        aria-label="原始记录表，可横向滚动"
+      >
+        <table id="record-table"></table>
+      </div>
+      <div id="record-error" class="error" role="alert"></div>
+      <div class="records-pagination">
+        <button id="records-prev" class="button">上一页</button
+        ><span id="record-page" role="status"></span
+        ><button id="records-next" class="button">下一页</button>
       </div>
     </dialog>
     <dialog id="ai-dialog">

@@ -1,5 +1,6 @@
 import { inspect_csv } from "./engine.js";
 import { examples } from "./examples.js";
+import { installAuthoring } from "./authoring.js";
 import {
   compute,
   createBundle,
@@ -347,7 +348,7 @@ $("bundle-file").onchange = async (event) => {
     await run(state.plan);
     notice(
       result.source_matches && result.report_matches
-        ? "复算一致：输入指纹与保存结果均匹配。"
+        ? `复算一致：输入指纹与保存结果均匹配。${result.upgraded ? "已使用 0.2.0 复算旧版报告包，重新导出即可保存新版。" : ""}`
         : "检测到变更：" +
             (!result.source_matches ? "输入指纹不匹配。 " : "") +
             (!result.report_matches ? "保存的结果与重新计算结果不同。 " : "") +
@@ -422,4 +423,5 @@ for (const dialog of document.querySelectorAll("dialog"))
         dialog.close();
     }
   });
+installAuthoring({ state, run, syncControls, download });
 loadExample("sales");

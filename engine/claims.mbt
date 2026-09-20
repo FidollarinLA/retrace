@@ -79,7 +79,7 @@ pub fn verify_json(
     response.stringify()
   } catch {
     error => {
-      let response : Json = { "ok": false, "error": error.to_string() }
+      let response : Json = { "ok": false, "error": input_error_message(error) }
       response.stringify()
     }
   }

@@ -1,0 +1,85 @@
+{
+  "format": "retrace-bundle",
+  "schema_version": 1,
+  "engine_version": "0.1.1",
+  "csv": "月份,区域,产品,销售额,成本\n2026-07,华东,专业版,42000,24500\n2026-07,华南,专业版,31000,18100\n2026-07,华北,团队版,28000,16400\n2026-08,华东,团队版,56000,32000\n2026-08,华南,专业版,38000,21700\n2026-08,华北,团队版,35000,20200\n2026-09,华东,专业版,68000,38500\n2026-09,华南,团队版,47000,26300\n2026-09,华北,专业版,43000,24500\n",
+  "plan": {
+    "schema_version": 1,
+    "title": "区域销售表现",
+    "metric": "销售额",
+    "operation": "sum",
+    "group_by": "区域",
+    "unit": "元",
+    "missing": "error",
+    "filters": [],
+    "derived": []
+  },
+  "report": {
+    "engine_version": "0.1.1",
+    "schema_version": 1,
+    "title": "区域销售表现",
+    "metric": "销售额",
+    "operation": "sum",
+    "group_by": "区域",
+    "unit": "元",
+    "missing": "error",
+    "source_rows": 9,
+    "matched_rows": 9,
+    "filtered_row_ids": [],
+    "evidence": [
+      {
+        "id": "e1",
+        "group": "华东",
+        "value": 166000,
+        "count": 3,
+        "row_ids": [
+          1,
+          4,
+          7
+        ],
+        "excluded_row_ids": [],
+        "values": [
+          42000,
+          56000,
+          68000
+        ]
+      },
+      {
+        "id": "e2",
+        "group": "华南",
+        "value": 116000,
+        "count": 3,
+        "row_ids": [
+          2,
+          5,
+          8
+        ],
+        "excluded_row_ids": [],
+        "values": [
+          31000,
+          38000,
+          47000
+        ]
+      },
+      {
+        "id": "e3",
+        "group": "华北",
+        "value": 106000,
+        "count": 3,
+        "row_ids": [
+          3,
+          6,
+          9
+        ],
+        "excluded_row_ids": [],
+        "values": [
+          28000,
+          35000,
+          43000
+        ]
+      }
+    ],
+    "warnings": []
+  },
+  "fingerprint": "8acab768d6b71535177cbb9e1a987cd2775c4062a922a320cb7bfdbf7d637c09"
+}

@@ -12,3 +12,8 @@ pub fn inspect_csv(csv : String) -> String {
 pub fn verify(csv : String, plan : String, draft : String) -> String {
   @engine.verify_json(csv, plan, draft)
 }
+
+///|
+pub fn trace(csv : String, plan : String, query : String) -> String {
+  @engine.trace_json(csv, plan, query)
+}

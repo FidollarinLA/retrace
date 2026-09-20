@@ -1,5 +1,5 @@
 import { analyze, verify } from "./engine.js";
-export const ENGINE_VERSION = "0.1.1";
+export const ENGINE_VERSION = "0.2.0";
 export function compute(csv, plan) {
   const result = JSON.parse(analyze(csv, JSON.stringify(plan)));
   if (!result.ok) throw new Error(result.error);
@@ -52,20 +52,25 @@ export async function replay(bundle) {
     !bundle ||
     bundle.format !== "retrace-bundle" ||
     bundle.schema_version !== 1 ||
-    bundle.engine_version !== ENGINE_VERSION ||
+    ![ENGINE_VERSION, "0.1.1"].includes(bundle.engine_version) ||
     typeof bundle.csv !== "string" ||
     !bundle.plan ||
     !bundle.report ||
     typeof bundle.fingerprint !== "string"
   )
     throw new Error(
-      "不支持的报告包或引擎版本。需要 ReTrace 0.1.1 / schema 1。",
+      "不支持的报告包或引擎版本。支持 ReTrace 0.1.1、0.2.0 / schema 1。",
     );
   const fresh = await createBundle(bundle.csv, bundle.plan);
   return {
     bundle: fresh,
     source_matches: fresh.fingerprint === bundle.fingerprint,
-    report_matches: canonical(fresh.report) === canonical(bundle.report),
+    // 0.1.1 uses the same numeric contract. Recompute with this engine and
+    // compare every saved field, allowing only the declared engine version.
+    report_matches:
+      canonical({ ...fresh.report, engine_version: bundle.engine_version }) ===
+      canonical(bundle.report),
+    upgraded: bundle.engine_version !== ENGINE_VERSION,
   };
 }
 export function modelPrompt(report) {

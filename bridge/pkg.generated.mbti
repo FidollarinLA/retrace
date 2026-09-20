@@ -6,6 +6,8 @@ pub fn analyze(String, String) -> String
 
 pub fn inspect_csv(String) -> String
 
+pub fn trace(String, String, String) -> String
+
 pub fn verify(String, String, String) -> String
 
 // Errors

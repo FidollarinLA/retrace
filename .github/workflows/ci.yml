@@ -42,6 +42,8 @@ jobs:
         run: |
           node --check dist/app.js
           node --check dist/bundle.js
+          node --check dist/planner.js
+          node --check dist/authoring.js
       - uses: actions/upload-artifact@v4
         with:
           name: retrace-browser-demo

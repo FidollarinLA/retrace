@@ -1002,3 +1002,137 @@ textarea {
     margin-top: 20px;
   }
 }
+/* Authoring and inspectable source records reuse the existing report surface. */
+.record-actions,
+.records-controls,
+.records-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-top: 20px;
+}
+.record-actions .button {
+  white-space: normal;
+}
+.records-controls {
+  margin-bottom: 20px;
+}
+.records-controls select {
+  max-width: 100%;
+  min-width: 130px;
+}
+.records-pagination {
+  justify-content: space-between;
+}
+.wide-dialog {
+  width: min(1100px, 94vw);
+  max-width: 1100px;
+}
+.table-scroll {
+  max-height: 55vh;
+  overflow: auto;
+  border: 1px solid #dce3e7;
+  border-radius: 8px;
+}
+#record-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 14px;
+}
+#record-table th,
+#record-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #e1e6e9;
+  white-space: pre-wrap;
+  min-width: 90px;
+  max-width: 360px;
+  overflow-wrap: anywhere;
+  vertical-align: top;
+}
+#record-table thead th {
+  position: sticky;
+  top: 0;
+  background: #edf2f5;
+  color: #193347;
+  z-index: 1;
+}
+#record-table th small {
+  display: block;
+  color: #506a7d;
+  font-weight: normal;
+}
+.record-included .record-status {
+  color: #136950;
+}
+.record-missing {
+  background: #fff8e8;
+}
+.record-missing .record-status {
+  color: #86570a;
+}
+.record-filtered {
+  background: #f2f4f6;
+  color: #536475;
+}
+.empty-cell {
+  color: #6b7780;
+  font-style: italic;
+}
+.model-settings {
+  margin: 20px 0;
+  padding: 16px;
+  border: 1px solid #dce3e7;
+  border-radius: 8px;
+}
+.model-settings summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.model-settings input {
+  display: block;
+  width: 100%;
+  margin: 6px 0 14px;
+}
+#planner-result {
+  margin: 16px 0;
+  overflow-wrap: anywhere;
+}
+#proposal-preview:not(:empty) {
+  background: #f0f6f9;
+  padding: 20px;
+  border-radius: 8px;
+}
+#proposal-preview h3 {
+  margin: 0 0 16px;
+}
+#proposal-preview dl {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 12px;
+}
+#proposal-preview dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+#proposal-preview dt {
+  font-weight: 600;
+}
+#planner-dialog label,
+#records-dialog label {
+  font-size: 14px;
+}
+@media (max-width: 600px) {
+  .records-controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  #proposal-preview dl {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  #proposal-preview dd {
+    margin-bottom: 10px;
+  }
+}
