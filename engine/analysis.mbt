@@ -163,7 +163,7 @@ pub fn analyze_json(csv : String, plan : String) -> String {
   try {
     let json = @json.parse(plan)
     let report = analyze_table(csv, json)
-    let response : Json = { "ok": true, "report": report.to_json() }
+    let response : Json = { "ok": true, "report": ToJson::to_json(report) }
     response.stringify()
   } catch {
     error => {

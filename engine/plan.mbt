@@ -42,7 +42,7 @@ fn parse_plan(json : Json, headers : Array[String]) -> Plan raise InputError {
     let right = required_string(d, "right")
     let _ = column_index(available, left)
     let _ = column_index(available, right)
-    derived.push({ name, op, left, right })
+    derived.push({ name, op, left, right, })
     available.push(name)
   }
   let metric = required_string(json, "metric")
@@ -72,7 +72,7 @@ fn parse_plan(json : Json, headers : Array[String]) -> Plan raise InputError {
     if op != "eq" && op != "ne" {
       let _ = number(value, "Filter threshold")
     }
-    filters.push({ column, op, value })
+    filters.push({ column, op, value, })
   }
   {
     title: string_field(json, "title", "ReTrace report"),
@@ -120,7 +120,7 @@ fn derive_table(table : Table, plan : Plan) -> Table raise InputError {
     }
     headers.push(d.name)
   }
-  { headers, rows }
+  { headers, rows, }
 }
 
 ///|

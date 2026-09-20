@@ -99,7 +99,7 @@ pub fn parse_csv(text : String) -> Table raise InputError {
     }
     rows.push(records[r])
   }
-  { headers, rows }
+  { headers, rows, }
 }
 
 ///|
