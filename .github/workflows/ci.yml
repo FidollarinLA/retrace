@@ -1,0 +1,43 @@
+name: ReTrace verification
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: moonbitlang/setup-moonbit@v1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: MoonBit checks and tests
+        run: |
+          moon check --deny-warn
+          moon test --target js --deny-warn
+          moon test --target wasm-gc --deny-warn
+          moon run cmd/retrace
+      - name: Generated API and formatting
+        run: |
+          moon info
+          moon fmt
+          git diff --exit-code -- '*.mbt' '*.mbti' moon.mod '**/moon.pkg'
+      - name: Compile browser engine
+        run: npm run build
+      - name: Integration and independent reference checks
+        run: |
+          npm test
+          npm run reference
+      - name: Verify static module syntax
+        run: |
+          node --check dist/app.js
+          node --check dist/bundle.js
+      - uses: actions/upload-artifact@v4
+        with:
+          name: retrace-browser-demo
+          path: dist/

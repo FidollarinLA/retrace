@@ -1,0 +1,27 @@
+import assert from 'node:assert/strict';
+import {spawnSync} from 'node:child_process';
+import {createBundle,replay,compute,checkDraft,reportHTML,canonical} from '../dist/bundle.js';
+import {examples} from '../dist/examples.js';
+import {requestDraft} from './ai.mjs';
+let tests=0;
+async function test(name,fn){await fn();tests++;console.log('PASS',name);}
+await test('three scenarios replay without changes',async()=>{for(const e of Object.values(examples)){const b=await createBundle(e.csv,e.plan),r=await replay(b);assert(r.source_matches&&r.report_matches);}});
+await test('report tampering detected',async()=>{const b=await createBundle(examples.sales.csv,examples.sales.plan);b.report.evidence[0].value++;const r=await replay(b);assert(r.source_matches&&!r.report_matches);});
+await test('data tampering detected',async()=>{const b=await createBundle(examples.sales.csv,examples.sales.plan);b.csv=b.csv.replace('42000','42001');const r=await replay(b);assert(!r.source_matches&&!r.report_matches);});
+await test('plan tampering detected',async()=>{const b=await createBundle(examples.sales.csv,examples.sales.plan);b.plan.operation='mean';const r=await replay(b);assert(!r.source_matches&&!r.report_matches);});
+await test('unknown bundle versions rejected',async()=>{const b=await createBundle(examples.sales.csv,examples.sales.plan);b.engine_version='99';await assert.rejects(()=>replay(b));});
+await test('JSON key order does not change input digest',async()=>{const a=await createBundle(examples.sales.csv,examples.sales.plan);const b=await createBundle(examples.sales.csv,Object.fromEntries(Object.entries(examples.sales.plan).reverse()));assert.equal(a.fingerprint,b.fingerprint);});
+await test('correct claims pass and invented numbers fail',()=>{const r=compute(examples.sales.csv,examples.sales.plan);const claims=r.evidence.map(e=>({evidence_id:e.id,value:e.value,unit:r.unit}));assert(checkDraft(examples.sales.csv,examples.sales.plan,{claims}).all_passed);claims[0].value++;assert(!checkDraft(examples.sales.csv,examples.sales.plan,{claims}).all_passed);});
+await test('free labels are not treated as verified prose',()=>{const draft={claims:[{evidence_id:'e1',value:166000,unit:'元',label:'This proves a causal effect'}]};const check=checkDraft(examples.sales.csv,examples.sales.plan,draft);assert(check.all_passed);assert(check.scope.includes('not verified'));});
+await test('HTML export escapes user-controlled text',async()=>{const p={...examples.sales.plan,title:'<script>alert(1)</script>',unit:'<img src=x onerror=alert(1)>'};const html=reportHTML(await createBundle(examples.sales.csv,p));assert(!html.includes('<script>'));assert(!html.includes('<img'));assert(html.includes('&lt;script&gt;'));});
+await test('adapter sends only aggregates and validates model output',async()=>{const b=await createBundle(examples.sales.csv,examples.sales.plan);let sent;
+ const r=await requestDraft(b,{endpoint:'http://localhost:11434/v1/chat/completions',model:'test-model',fetchImpl:async(url,opts)=>{sent=JSON.parse(opts.body);return new Response(JSON.stringify({choices:[{message:{content:JSON.stringify({claims:[{evidence_id:'e1',value:166000,unit:'元'}]})}}]}));}});
+ assert(r.verification.all_passed);assert(!canonical(sent).includes('24500'));assert(canonical(sent).includes('166000'));
+});
+await test('adapter rejects invented model numbers',async()=>{const b=await createBundle(examples.sales.csv,examples.sales.plan);const r=await requestDraft(b,{endpoint:'http://localhost:11434/v1/chat/completions',model:'test',fetchImpl:async()=>new Response(JSON.stringify({choices:[{message:{content:'{"claims":[{"evidence_id":"e1","value":999,"unit":"元"}]}'}}]}))});assert(!r.verification.all_passed);});
+await test('adapter rejects corrupted bundle before any network request',async()=>{const b=await createBundle(examples.sales.csv,examples.sales.plan);b.report.evidence[0].value=0;let calls=0;await assert.rejects(()=>requestDraft(b,{endpoint:'https://example.com/api',model:'test',fetchImpl:()=>{calls++;}}));assert.equal(calls,0);});
+await test('CLI fails with nonzero status on invalid input',()=>{const p=spawnSync(process.execPath,['scripts/cli.mjs','analyze','/nonexistent','/nonexistent'],{encoding:'utf8'});assert.equal(p.status,1);});
+await test('empty aggregate is explicit JSON null',()=>{const r=compute('g,v\nA,\nB,2',{schema_version:1,metric:'v',group_by:'g',missing:'skip',operation:'sum'});assert.equal(r.evidence[0].value,null);});
+await test('claim expected values are numbers, not option arrays',()=>{const r=checkDraft(examples.sales.csv,examples.sales.plan,{claims:[{evidence_id:'e1',value:166000,unit:'元'}]});assert.equal(r.checks[0].expected,166000);});
+await test('large claims cannot hide meaningful errors in relative tolerance',()=>{const r=checkDraft('v\n1000000000000',{schema_version:1,metric:'v',operation:'sum'},{claims:[{evidence_id:'e1',value:1000000000100}]});assert(!r.all_passed);});
+console.log(`${tests} integration checks passed.`);

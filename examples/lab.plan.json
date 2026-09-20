@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "title": "实验测量结果复核",
+  "metric": "测量值",
+  "operation": "mean",
+  "group_by": "实验组",
+  "unit": "mg/L",
+  "missing": "skip",
+  "filters": [],
+  "derived": []
+}

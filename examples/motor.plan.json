@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "title": "电机温升对比",
+  "metric": "温升",
+  "operation": "max",
+  "group_by": "设备",
+  "unit": "K",
+  "missing": "error",
+  "filters": [],
+  "derived": [
+    {
+      "name": "温升",
+      "op": "subtract",
+      "left": "绕组温度",
+      "right": "环境温度"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "retrace-moonbit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node scripts/test.mjs",
+    "start": "node scripts/server.mjs",
+    "reference": "python3 scripts/reference_check.py"
+  },
+  "engines": {"node": ">=22"}
+}

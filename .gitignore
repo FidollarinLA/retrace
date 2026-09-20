@@ -1,0 +1,11 @@
+_build/
+.mooncakes/
+.DS_Store
+node_modules/
+.env
+.env.*
+!.env.example
+output/
+.openai/*.local.*
+
+docs/WORKLOG.md

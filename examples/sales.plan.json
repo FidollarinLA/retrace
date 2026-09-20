@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "title": "区域销售表现",
+  "metric": "销售额",
+  "operation": "sum",
+  "group_by": "区域",
+  "unit": "元",
+  "missing": "error",
+  "filters": [],
+  "derived": []
+}
