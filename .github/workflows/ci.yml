@@ -9,7 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: moonbitlang/setup-moonbit@v1
+      - name: Install MoonBit from the official distribution
+        run: |
+          curl --fail --silent --show-error --location https://cli.moonbitlang.com/install/unix.sh -o "$RUNNER_TEMP/install-moonbit.sh"
+          bash "$RUNNER_TEMP/install-moonbit.sh"
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
