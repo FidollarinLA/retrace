@@ -1,0 +1,68 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "FidollarinLA/retrace/engine"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn analyze_json(String, String) -> String
+
+pub fn analyze_table(String, Json) -> Report raise InputError
+
+pub fn inspect_csv_json(String) -> Json raise InputError
+
+pub fn inspect_json(String) -> String
+
+pub fn parse_csv(String) -> Table raise InputError
+
+pub fn verify_json(String, String, String) -> String
+
+// Errors
+pub suberror InputError {
+  InputError(String)
+} derive(@debug.Debug)
+pub fn InputError::to_string(Self) -> String
+
+// Types and methods
+type Derived derive(@debug.Debug)
+
+pub(all) struct Evidence {
+  id : String
+  group : String
+  value : Double?
+  count : Int
+  row_ids : Array[Int]
+  excluded_row_ids : Array[Int]
+  values : Array[Double]
+} derive(@debug.Debug)
+pub impl ToJson for Evidence
+
+type Filter derive(@debug.Debug)
+
+type Plan derive(@debug.Debug)
+
+pub(all) struct Report {
+  engine_version : String
+  schema_version : Int
+  title : String
+  metric : String
+  operation : String
+  group_by : String
+  unit : String
+  missing : String
+  source_rows : Int
+  matched_rows : Int
+  filtered_row_ids : Array[Int]
+  evidence : Array[Evidence]
+  warnings : Array[String]
+} derive(ToJson, @debug.Debug)
+
+pub(all) struct Table {
+  headers : Array[String]
+  rows : Array[Array[String]]
+} derive(Eq, @debug.Debug)
+
+// Type aliases
+
+// Traits

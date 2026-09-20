@@ -1,0 +1,17 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "FidollarinLA/retrace/bridge"
+
+// Values
+pub fn analyze(String, String) -> String
+
+pub fn inspect_csv(String) -> String
+
+pub fn verify(String, String, String) -> String
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits

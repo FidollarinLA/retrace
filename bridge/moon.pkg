@@ -1,0 +1,9 @@
+import {
+  "FidollarinLA/retrace/engine",
+}
+
+options(
+  link: {
+    "js": { "exports": [ "analyze", "inspect_csv", "verify" ], "format": "esm" },
+  },
+)
