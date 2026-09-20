@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1 — 2026-09-21
+
+Preview changes between the current report and a proposed analysis plan before applying it. Show setting changes, group values and, for unchanged CSV input, source-record membership changes. Explicitly mark grouping or formula changes as not directly comparable. Add a CLI comparison of two replay-verified bundles; tampered reports are refused. The published MoonBit numerical contract remains 0.2.0.
+
 ## 0.2.0 — 2026-09-20
 
 Natural-language planning through a user-chosen model, copied prompt or local CLI, followed by strict MoonBit validation and explicit review before application. Source-record inspection now shows original and derived cells, included/missing/filtered states, evidence scoping and pagination; original CSV is downloadable.

@@ -75,3 +75,9 @@ Query keys: `offset` (integer 0..20000, default 0), `limit` (1..100, default 25)
 The optional planner sends a question (1..4000 characters) and column summaries to a user-selected chat-completions endpoint. It accepts a Plan v1 JSON object, optionally in a JSON code fence, and validates by executing it with MoonBit. A single `{error:"clarification question"}` is surfaced without application. Unknown columns, unknown operators, executable fields and invalid calculations fail. The browser previews method, grouping, unit, missing policy, filters and derived columns; only explicit confirmation replaces the current report. Editing the proposal invalidates confirmation. No intent correctness guarantee is made.
 
 Direct model calls allow HTTPS or loopback HTTP, reject URL credentials and redirects, stop after 60 seconds, and cap response streams at 1 MB. Browser CORS and mixed-content restrictions still apply. There is no embedded key or background model request.
+
+## Analysis comparison (browser/CLI 0.2.1)
+
+The browser compares a validated proposed plan against the current MoonBit report before applying it. `node scripts/cli.mjs compare before.json after.json` compares two report bundles only after replay confirms both stored inputs and reports. The comparison lists changed Plan v1 settings, source and matched row counts, group values, and, when the exact CSV text is unchanged, included/missing source-record ID differences.
+
+Groups are aligned by group label only when the grouping field and its derived definition are unchanged. Value changes are directly comparable only when metric, operation, group, unit and derived definitions match. Otherwise the interface shows both results without treating their difference as an increase or decrease. A changed CSV invalidates cross-version record-ID comparison. This is a descriptive comparison, not a causal attribution of a result to one plan field or proof that the plan matches the user's intent.

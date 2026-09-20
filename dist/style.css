@@ -1119,6 +1119,46 @@ textarea {
 #proposal-preview dt {
   font-weight: 600;
 }
+#proposal-preview .comparison {
+  border-top: 1px solid #d6e2e7;
+  margin-top: 20px;
+  padding-top: 20px;
+}
+#proposal-preview .comparison h3 {
+  margin-bottom: 8px;
+}
+#proposal-preview .comparison details {
+  margin: 12px 0;
+}
+#proposal-preview .comparison summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+#proposal-preview .comparison dl {
+  display: block;
+  margin: 12px 0;
+}
+#proposal-preview .comparison dl > div {
+  border-bottom: 1px solid #dce7eb;
+  padding: 9px 0;
+}
+#proposal-preview .comparison dd {
+  font-size: 12px;
+  margin-top: 4px;
+  white-space: pre-wrap;
+}
+#proposal-preview .comparison ul {
+  padding-left: 20px;
+  line-height: 1.7;
+}
+#proposal-preview .comparison li {
+  margin-bottom: 9px;
+  overflow-wrap: anywhere;
+}
+#proposal-preview .comparison small {
+  display: block;
+  color: #586e78;
+}
 #planner-dialog label,
 #records-dialog label {
   font-size: 14px;

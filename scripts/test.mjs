@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { readFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import {
   planningPrompt,
   validateProposal,
@@ -17,6 +19,7 @@ import {
   canonical,
 } from "../dist/bundle.js";
 import { examples } from "../dist/examples.js";
+import { compareAnalyses } from "../dist/compare.js";
 import { requestDraft } from "./ai.mjs";
 let tests = 0;
 async function test(name, fn) {
@@ -362,5 +365,92 @@ await test("trace keeps multiline cells and original number spelling", () => {
   });
   assert.deepEqual(page.records[0].cells, ["010", "first\nsecond"]);
   assert.equal(page.records[0].id, 1);
+});
+await test("plan comparison locates changed values and source record IDs", async () => {
+  const { csv, plan } = examples.sales;
+  const before = await createBundle(csv, plan);
+  const after = await createBundle(csv, {
+    ...plan,
+    filters: [{ column: "产品", op: "eq", value: "专业版" }],
+  });
+  const comparison = compareAnalyses(before, after);
+  assert.deepEqual(
+    comparison.setting_changes.map((x) => x.field),
+    ["filters"],
+  );
+  assert(comparison.groups_aligned && comparison.values_comparable);
+  assert(comparison.record_ids_comparable && !comparison.input_changed);
+  const east = comparison.changed_groups.find((g) => g.group === "华东");
+  assert.equal(east.before_value, 166000);
+  assert.equal(east.after_value, 110000);
+  assert.deepEqual(east.included.removed, [4]);
+  assert.deepEqual(east.included.added, []);
+});
+await test("plan comparison distinguishes settings from numerical effects", async () => {
+  const { csv, plan } = examples.sales;
+  const before = await createBundle(csv, plan);
+  const titleOnly = await createBundle(csv, { ...plan, title: "新标题" });
+  const titleComparison = compareAnalyses(before, titleOnly);
+  assert.deepEqual(
+    titleComparison.setting_changes.map((x) => x.field),
+    ["title"],
+  );
+  assert.equal(titleComparison.changed_groups.length, 0);
+  const mean = await createBundle(csv, { ...plan, operation: "mean" });
+  const methodComparison = compareAnalyses(before, mean);
+  assert(methodComparison.groups_aligned && !methodComparison.values_comparable);
+  const regrouped = await createBundle(csv, { ...plan, group_by: "月份" });
+  const groupingComparison = compareAnalyses(before, regrouped);
+  assert(!groupingComparison.groups_aligned);
+  assert.deepEqual(groupingComparison.changed_groups, []);
+  const motor = examples.motor;
+  const motorBefore = await createBundle(motor.csv, motor.plan);
+  const motorAfter = await createBundle(motor.csv, {
+    ...motor.plan,
+    derived: [{ ...motor.plan.derived[0], op: "add" }],
+  });
+  const formulaComparison = compareAnalyses(motorBefore, motorAfter);
+  assert(formulaComparison.groups_aligned && !formulaComparison.values_comparable);
+});
+await test("changed input prevents cross-version record ID attribution", async () => {
+  const { csv, plan } = examples.sales;
+  const before = await createBundle(csv, plan);
+  const after = await createBundle(csv.replace("专业版,42000", "团队版,42000"), plan);
+  const comparison = compareAnalyses(before, after);
+  assert(comparison.input_changed);
+  assert(!comparison.record_ids_comparable);
+  assert.equal(comparison.changed_groups.length, 0);
+});
+await test("comparison CLI replays both bundles and rejects tampering", async () => {
+  const folder = await mkdtemp(join(tmpdir(), "retrace-compare-"));
+  try {
+    const { csv, plan } = examples.lab;
+    const before = await createBundle(csv, plan);
+    const after = await createBundle(csv, { ...plan, title: "复核标题" });
+    const oldPath = join(folder, "old.json");
+    const newPath = join(folder, "new.json");
+    await writeFile(oldPath, JSON.stringify(before));
+    await writeFile(newPath, JSON.stringify(after));
+    const valid = spawnSync(
+      process.execPath,
+      ["scripts/cli.mjs", "compare", oldPath, newPath],
+      { encoding: "utf8" },
+    );
+    assert.equal(valid.status, 0, valid.stderr);
+    assert.deepEqual(
+      JSON.parse(valid.stdout).setting_changes.map((x) => x.field),
+      ["title"],
+    );
+    after.report.evidence[0].value = 999;
+    await writeFile(newPath, JSON.stringify(after));
+    const invalid = spawnSync(
+      process.execPath,
+      ["scripts/cli.mjs", "compare", oldPath, newPath],
+      { encoding: "utf8" },
+    );
+    assert.equal(invalid.status, 1);
+  } finally {
+    await rm(folder, { recursive: true, force: true });
+  }
 });
 console.log(`${tests} integration checks passed.`);

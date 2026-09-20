@@ -12,7 +12,7 @@
 ## 0.2 — complete the authoring workflow
 - [x] Natural-language question → a strictly validated Plan v1, with visible proposal before applying it. User-chosen model endpoints, copy/paste and CLI supported; adapter validated with mocks, live-provider acceptance pending.
 - [x] Source record preview with included/excluded row highlighting, derived cells, pagination and original CSV download.
-- [ ] Plan comparison: which input/filter/derived change changed which number?
+- [x] Plan comparison: show changed inputs/settings, group values and source-record membership before applying a proposed plan; replay-checked bundle comparison also works in the CLI. Multiple simultaneous changes are shown without claiming individual causality.
 - [ ] Improve Chinese error explanations without losing machine-readable detail.
 - [ ] User-reviewed acceptance of desktop/mobile interaction and keyboard navigation.
 

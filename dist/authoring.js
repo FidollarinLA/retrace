@@ -5,6 +5,7 @@ import {
   traceRecords,
 } from "./planner.js";
 import { escapeHTML as esc } from "./bundle.js";
+import { compareAnalyses } from "./compare.js";
 const $ = (id) => document.getElementById(id);
 const statusNames = {
   included: "参与计算",
@@ -30,6 +31,63 @@ const operations = {
   count: "有效数值计数",
 };
 
+function showSetting(value) {
+  if (Array.isArray(value)) return value.length ? JSON.stringify(value) : "无";
+  return String(value || "无");
+}
+
+function showValue(present, value) {
+  return !present ? "无此分组" : value === null ? "数据不足" : String(value);
+}
+
+function showIds(ids) {
+  return ids.length
+    ? ids.slice(0, 8).map((id) => `#${id}`).join("、") +
+        (ids.length > 8 ? ` 等 ${ids.length} 条` : "")
+    : "无";
+}
+
+function comparisonHTML(comparison) {
+  const settings = comparison.setting_changes.length
+    ? comparison.setting_changes
+        .map(
+          ({ label, before, after }) =>
+            `<div><dt>${esc(label)}</dt><dd>${esc(showSetting(before))} → ${esc(showSetting(after))}</dd></div>`,
+        )
+        .join("")
+    : "<div><dt>状态</dt><dd>分析配置未改变</dd></div>";
+  let results;
+  if (!comparison.groups_aligned) {
+    const list = (groups) =>
+      groups
+        .slice(0, 8)
+        .map((g) => `${esc(g.group || "（空分组）")}：${esc(showValue(true, g.value))}`)
+        .join("；") + (groups.length > 8 ? `；另有 ${groups.length - 8} 组` : "");
+    results = `<p>分组字段或其派生定义已改变，不能按同名分组对齐。当前：${list(comparison.before.groups) || "无结果"}。建议：${list(comparison.after.groups) || "无结果"}。</p>`;
+  } else if (!comparison.changed_groups.length) {
+    results = comparison.input_changed
+      ? "<p>汇总数值未改变；输入已变，记录编号不能跨版本对齐。</p>"
+      : "<p>当前数据下，各组数值与参与记录均未改变。</p>";
+  } else {
+    results = `<p>${comparison.changed_groups.length} 个分组的数值或记录发生变化：</p><ul>${comparison.changed_groups
+      .slice(0, 8)
+      .map((g) => {
+        const records = comparison.record_ids_comparable
+          ? `<small>参与记录新增 ${esc(showIds(g.included.added))}；移出 ${esc(showIds(g.included.removed))}。${g.excluded.added.length || g.excluded.removed.length ? ` 缺失排除新增 ${esc(showIds(g.excluded.added))}；移出 ${esc(showIds(g.excluded.removed))}。` : ""}</small>`
+          : "";
+        return `<li><strong>${esc(g.group || "（空分组）")}</strong>：${esc(showValue(g.before_present, g.before_value))} → ${esc(showValue(g.after_present, g.after_value))}；有效记录 ${g.before_count} → ${g.after_count}${records}</li>`;
+      })
+      .join("")}</ul>${comparison.changed_groups.length > 8 ? `<p>仅显示前 8 组；完整结果可导出报告包核查。</p>` : ""}`;
+  }
+  return `<section class="comparison" aria-label="配置变更影响"><h3>与当前报告相比</h3>
+    <p>匹配记录 ${comparison.before.matched_rows} → ${comparison.after.matched_rows}；源记录 ${comparison.before.source_rows} → ${comparison.after.source_rows}。</p>
+    <details><summary>${comparison.setting_changes.length} 项配置变化</summary><dl>${settings}</dl></details>
+    ${results}
+    ${comparison.values_comparable ? "" : "<p>指标、算法、分组、单位或派生定义已变；两侧数值只供查看，不能直接解释为增减。</p>"}
+    ${comparison.input_changed ? "<p>输入 CSV 已变，记录编号不能跨版本对齐。</p>" : ""}
+    <p>这里列出同时发生的变化；多项设置一起改变时，不能把结果差异单独归因于某一项。</p></section>`;
+}
+
 export function installAuthoring({ state, run, syncControls, download }) {
   let proposal = null,
     proposedCSV = "",
@@ -51,6 +109,10 @@ export function installAuthoring({ state, run, syncControls, download }) {
       proposalRevision = state.revision;
       const r = proposal.report,
         p = proposal.plan;
+      const comparison = compareAnalyses(
+        { csv: state.csv, plan: state.plan, report: state.report },
+        { csv: state.csv, plan: p, report: r },
+      );
       $("proposal-preview").innerHTML = `<h3>确认这些选择符合你的问题</h3>
         <dl><dt>指标 / 方式</dt><dd>${esc(r.metric)} · ${esc(operations[r.operation])}</dd>
         <dt>分组 / 单位</dt><dd>${esc(r.group_by || "不分组")} · ${esc(r.unit || "未指定单位")}</dd>
@@ -58,7 +120,8 @@ export function installAuthoring({ state, run, syncControls, download }) {
         <dt>筛选</dt><dd>${esc((p.filters || []).map((f) => `${f.column} ${filterNames[f.op]} ${JSON.stringify(f.value)}`).join("；且 ") || "无筛选")}</dd>
         <dt>派生指标</dt><dd>${esc((p.derived || []).map((d) => `${d.name} = ${d.left} ${derivedNames[d.op]} ${d.right}`).join("；") || "无派生指标")}</dd></dl>
         <p>试算匹配 ${r.matched_rows} / ${r.source_rows} 条记录，${r.evidence.length} 个分组。当前报告尚未改变。</p>
-        <p>校验说明配置可以计算；仍需你确认分析意图、筛选口径与单位。</p>`;
+        <p>校验说明配置可以计算；仍需你确认分析意图、筛选口径与单位。</p>
+        ${comparisonHTML(comparison)}`;
       $("confirm-proposal").disabled = false;
       $("planner-result").textContent = "配置校验通过，等待确认。";
     } catch (error) {

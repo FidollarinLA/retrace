@@ -7,6 +7,7 @@ import {
   modelPrompt,
   reportHTML,
 } from "../dist/bundle.js";
+import { compareAnalyses } from "../dist/compare.js";
 const [command, ...args] = process.argv.slice(2);
 const readJSON = async (p) => JSON.parse(await readFile(p, "utf8"));
 try {
@@ -51,9 +52,22 @@ try {
     if (!r.source_matches || !r.report_matches)
       throw new Error("Bundle mismatch");
     await writeFile(args[1], reportHTML(r.bundle));
+  } else if (command === "compare" && args.length === 2) {
+    const before = await replay(await readJSON(args[0]));
+    const after = await replay(await readJSON(args[1]));
+    if (
+      !before.source_matches ||
+      !before.report_matches ||
+      !after.source_matches ||
+      !after.report_matches
+    )
+      throw new Error("One or both report bundles failed recomputation.");
+    console.log(
+      JSON.stringify(compareAnalyses(before.bundle, after.bundle), null, 2),
+    );
   } else {
     console.log(
-      "ReTrace 0.1.1\n\nnode scripts/cli.mjs analyze input.csv plan.json [bundle.json]\nnode scripts/cli.mjs replay bundle.json\nnode scripts/cli.mjs verify bundle.json draft.json\nnode scripts/cli.mjs prompt bundle.json\nnode scripts/cli.mjs html bundle.json report.html",
+      "ReTrace 0.2.0\n\nnode scripts/cli.mjs analyze input.csv plan.json [bundle.json]\nnode scripts/cli.mjs replay bundle.json\nnode scripts/cli.mjs verify bundle.json draft.json\nnode scripts/cli.mjs prompt bundle.json\nnode scripts/cli.mjs html bundle.json report.html\nnode scripts/cli.mjs compare before.json after.json",
     );
     if (command && command !== "--help") process.exitCode = 1;
   }
