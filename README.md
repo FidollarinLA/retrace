@@ -4,7 +4,7 @@
 
 ReTrace is an open-source MoonBit engine for recomputable data reports. CSV + a versioned analysis plan produce deterministic statistics, record-level evidence and a replayable report bundle. Optional AI-generated numeric claims are checked against a fresh execution before use.
 
-> 0.2.1 is a working browser/CLI prototype for the September 2026 MoonBit Hackathon, using the published 0.2.0 MoonBit engine. All included datasets are synthetic. It does not certify data authenticity, causal conclusions or engineering compliance.
+> 0.2.2 is a working browser/CLI prototype for the September 2026 MoonBit Hackathon, using the published 0.2.0 MoonBit engine. All included datasets are synthetic. It does not certify data authenticity, causal conclusions or engineering compliance.
 
 ## Package
 
@@ -40,6 +40,7 @@ moon run cmd/retrace
 - Open the original records behind a chart, with included / missing / filtered states, derived cells, pagination and original CSV download. Parsing and record classification run in MoonBit.
 - Turn a natural-language question into a proposed Plan v1 using your chosen model. Inspect the metric, filters, missing policy, units and trial execution before explicitly applying it.
 - Compare a proposed plan with the current report before applying it: see changed settings, group values and included/excluded source-record IDs. Changed grouping or formula definitions are flagged as not directly comparable.
+- Read actionable Chinese summaries for common CSV and calculation errors, with the original technical message still available in an expandable detail.
 - Inspect three scenarios using the **same engine**: regional sales, laboratory measurements and motor temperature rise.
 - Export standalone HTML or a JSON bundle containing the CSV, plan, engine version, calculated results and a SHA-256 input fingerprint.
 - Import a bundle and recompute; flag changed inputs, changed saved results and unsupported versions.
@@ -98,7 +99,7 @@ npm run reference
 moon info && moon fmt
 ```
 
-0.2.1 validation: 20 MoonBit tests on each of JS and Wasm-GC, 30 integration checks, and 560 seeded Python-reference scenarios containing 1,673 aggregate/provenance comparisons. The independent oracle uses Python `statistics`, `math.fsum` and `csv`, without importing application logic. These are correctness tests, not evidence of real-world diagnostic accuracy. Browser interaction, mobile layout and live-provider acceptance remain unverified.
+0.2.2 validation: 20 MoonBit tests on each of JS and Wasm-GC, 31 integration checks, and 560 seeded Python-reference scenarios containing 1,673 aggregate/provenance comparisons. The independent oracle uses Python `statistics`, `math.fsum` and `csv`, without importing application logic. These are correctness tests, not evidence of real-world diagnostic accuracy. Browser interaction, mobile layout and live-provider acceptance remain unverified.
 
 For reproducible synthetic throughput measurements, run `npm run benchmark` and read [the measured environment and results](docs/BENCHMARK.md). These are local Node.js timings, not a browser or hosted-service service-level claim.
 

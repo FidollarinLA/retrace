@@ -6,6 +6,7 @@ import {
 } from "./planner.js";
 import { escapeHTML as esc } from "./bundle.js";
 import { compareAnalyses } from "./compare.js";
+import { showError } from "./errors.js";
 const $ = (id) => document.getElementById(id);
 const statusNames = {
   included: "参与计算",
@@ -125,7 +126,7 @@ export function installAuthoring({ state, run, syncControls, download }) {
       $("confirm-proposal").disabled = false;
       $("planner-result").textContent = "配置校验通过，等待确认。";
     } catch (error) {
-      $("planner-result").textContent = error.message;
+      showError($("planner-result"), error);
     }
   }
   $("open-planner").onclick = () => {
@@ -157,7 +158,7 @@ export function installAuthoring({ state, run, syncControls, download }) {
         $("planner-result").textContent = "请从展开的文本框手动复制提示词。";
       }
     } catch (error) {
-      $("planner-result").textContent = error.message;
+      showError($("planner-result"), error);
     }
   };
   $("generate-plan").onclick = async () => {
@@ -180,9 +181,13 @@ export function installAuthoring({ state, run, syncControls, download }) {
       $("proposal-editor").value = JSON.stringify(result.plan, null, 2);
       preview();
     } catch (error) {
-      if (token === generation)
-        $("planner-result").textContent =
-          `${error.message} 浏览器跨域限制可改用复制提示词，或本地命令行接口。`;
+      if (token === generation) {
+        showError($("planner-result"), error);
+        const advice = document.createElement("p");
+        advice.textContent =
+          "若浏览器跨域限制了请求，可改用复制提示词或本地命令行接口。";
+        $("planner-result").append(advice);
+      }
     } finally {
       $("generate-plan").disabled = false;
     }
@@ -224,7 +229,7 @@ export function installAuthoring({ state, run, syncControls, download }) {
       $("record-error").textContent = "";
     } catch (error) {
       $("record-table").replaceChildren();
-      $("record-error").textContent = error.message;
+      showError($("record-error"), error);
     }
   }
   function openRecords(evidenceId = "") {

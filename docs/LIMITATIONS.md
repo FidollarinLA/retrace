@@ -13,3 +13,4 @@
 - Trace pages return at most 100 records (25 in the UI), but each page recomputes the full analysis. Performance at every configured limit is not yet benchmarked.
 - Synthetic laboratory/motor examples prove workflow behavior, not real-world diagnostic validity. No claims about maintenance savings, fault accuracy or energy savings have been made.
 - Analysis comparison reports what changed between two computed results. When several settings change together, it cannot isolate which setting caused a numeric difference. Record IDs are compared only when the exact CSV text is unchanged; changed group or derived definitions limit direct value comparisons.
+- Chinese error summaries cover common known messages; unfamiliar errors remain in their original form. The original technical message can contain user-provided field or cell text, so treat screenshots and copied errors as data-bearing.

@@ -1,6 +1,7 @@
 import { inspect_csv } from "./engine.js";
 import { examples } from "./examples.js";
 import { installAuthoring } from "./authoring.js";
+import { showError } from "./errors.js";
 import {
   compute,
   createBundle,
@@ -36,6 +37,11 @@ function notice(text, error = false) {
   $("notice").hidden = false;
   $("notice").className = error ? "error" : "";
   $("notice").textContent = text;
+}
+function noticeError(error) {
+  $("notice").hidden = false;
+  $("notice").className = "error";
+  showError($("notice"), error);
 }
 function download(content, name, type) {
   const a = document.createElement("a");
@@ -134,7 +140,7 @@ async function run(plan = controlsPlan()) {
     if (revision !== state.revision) return;
     state.report = null;
     $("results").hidden = true;
-    notice(error.message, true);
+    noticeError(error);
   }
 }
 function selectEvidence(index) {
@@ -261,7 +267,7 @@ $("csv-file").onchange = async (event) => {
     $("csv-editor").value = await file.text();
     $("data-error").textContent = "";
   } catch (e) {
-    $("data-error").textContent = e.message;
+    showError($("data-error"), e);
   }
   event.target.value = "";
 };
@@ -296,7 +302,7 @@ $("apply-data").onclick = async () => {
       .forEach((b) => b.classList.remove("active"));
     await run(state.plan);
   } catch (e) {
-    $("data-error").textContent = e.message;
+    showError($("data-error"), e);
   }
 };
 $("open-plan").onclick = () => {
@@ -313,7 +319,7 @@ $("apply-plan").onclick = async () => {
     $("plan-dialog").close();
     await run(plan);
   } catch (e) {
-    $("plan-error").textContent = e.message;
+    showError($("plan-error"), e);
   }
 };
 $("export-bundle").onclick = () => {
@@ -356,7 +362,7 @@ $("bundle-file").onchange = async (event) => {
       !(result.source_matches && result.report_matches),
     );
   } catch (e) {
-    notice(e.message, true);
+    noticeError(e);
   }
   event.target.value = "";
 };
@@ -407,7 +413,7 @@ $("verify-draft").onclick = () => {
         .join("") +
       "<p>以上只核验结构化数值、单位和证据引用，不核验自由文本含义。</p>";
   } catch (e) {
-    $("draft-result").textContent = e.message;
+    showError($("draft-result"), e);
   }
 };
 for (const dialog of document.querySelectorAll("dialog"))

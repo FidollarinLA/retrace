@@ -20,6 +20,7 @@ import {
 } from "../dist/bundle.js";
 import { examples } from "../dist/examples.js";
 import { compareAnalyses } from "../dist/compare.js";
+import { describeError } from "../dist/errors.js";
 import { requestDraft } from "./ai.mjs";
 let tests = 0;
 async function test(name, fn) {
@@ -452,5 +453,48 @@ await test("comparison CLI replays both bundles and rejects tampering", async ()
   } finally {
     await rm(folder, { recursive: true, force: true });
   }
+});
+await test("Chinese error guidance retains exact underlying detail", () => {
+  const cases = [
+    [
+      () => compute("g,v\nA", { schema_version: 1, metric: "v" }),
+      "csv_column_count",
+      "第 1 条数据有 1 列",
+    ],
+    [
+      () => compute("g,v\nA,", { schema_version: 1, metric: "v" }),
+      "missing_metric",
+      "第 1 条数据的「v」为空",
+    ],
+    [
+      () =>
+        compute("a,b\n1,0", {
+          schema_version: 1,
+          metric: "ratio",
+          derived: [
+            { name: "ratio", op: "divide", left: "a", right: "b" },
+          ],
+        }),
+      "division_by_zero",
+      "除数为 0",
+    ],
+  ];
+  for (const [run, code, summary] of cases) {
+    let caught;
+    try {
+      run();
+    } catch (error) {
+      caught = error;
+    }
+    assert(caught);
+    const guidance = describeError(caught);
+    assert.equal(guidance.code, code);
+    assert(guidance.summary.includes(summary));
+    assert.equal(guidance.detail, caught.message);
+  }
+  const unknown = describeError(new Error("Unexpected technical detail"));
+  assert.equal(unknown.code, "unclassified");
+  assert.equal(unknown.summary, unknown.detail);
+  assert.equal(describeError(new SyntaxError("bad JSON")).code, "invalid_json");
 });
 console.log(`${tests} integration checks passed.`);

@@ -81,3 +81,7 @@ Direct model calls allow HTTPS or loopback HTTP, reject URL credentials and redi
 The browser compares a validated proposed plan against the current MoonBit report before applying it. `node scripts/cli.mjs compare before.json after.json` compares two report bundles only after replay confirms both stored inputs and reports. The comparison lists changed Plan v1 settings, source and matched row counts, group values, and, when the exact CSV text is unchanged, included/missing source-record ID differences.
 
 Groups are aligned by group label only when the grouping field and its derived definition are unchanged. Value changes are directly comparable only when metric, operation, group, unit and derived definitions match. Otherwise the interface shows both results without treating their difference as an increase or decrease. A changed CSV invalidates cross-version record-ID comparison. This is a descriptive comparison, not a causal attribution of a result to one plan field or proof that the plan matches the user's intent.
+
+## Browser error guidance (0.2.2)
+
+The browser host maps common engine/runtime errors to a Chinese summary and keeps the exact original message under “查看原始错误信息”. `describeError` returns `{code, summary, detail}` for host integrations; `code` is advisory and not part of the MoonBit engine or versioned JSON API contract. Unrecognized errors are shown verbatim. Engine computation and its original error strings are unchanged.

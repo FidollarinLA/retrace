@@ -679,6 +679,21 @@ footer a {
   color: #a94730;
   overflow-wrap: anywhere;
 }
+.error-detail {
+  margin-top: 6px;
+  font-size: 12px;
+}
+.error-detail summary {
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.error-detail code {
+  display: block;
+  margin-top: 6px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
 dialog {
   width: min(740px, calc(100vw - 32px));
   max-height: 90vh;
@@ -737,8 +752,11 @@ textarea {
   display: flex;
   gap: 20px;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-top: 16px;
+}
+.dialog-actions .error {
+  flex: 1;
 }
 .ai-actions {
   display: flex;

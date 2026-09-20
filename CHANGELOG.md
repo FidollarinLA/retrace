@@ -1,8 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.2.2 — 2026-09-21
 
-Add a deterministic synthetic benchmark generator and publish measured single-machine results with hardware, runtime and timing scope disclosed. No computation or bundle contract change.
+Add a deterministic synthetic benchmark generator and publish measured single-machine results with hardware, runtime and timing scope disclosed. Add Chinese guidance for common browser errors while preserving exact technical detail; unknown errors remain verbatim. The MoonBit computation and bundle contract remain at 0.2.0.
 
 ## 0.2.1 — 2026-09-21
 
