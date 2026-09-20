@@ -100,6 +100,8 @@ moon info && moon fmt
 
 0.2.1 validation: 20 MoonBit tests on each of JS and Wasm-GC, 30 integration checks, and 560 seeded Python-reference scenarios containing 1,673 aggregate/provenance comparisons. The independent oracle uses Python `statistics`, `math.fsum` and `csv`, without importing application logic. These are correctness tests, not evidence of real-world diagnostic accuracy. Browser interaction, mobile layout and live-provider acceptance remain unverified.
 
+For reproducible synthetic throughput measurements, run `npm run benchmark` and read [the measured environment and results](docs/BENCHMARK.md). These are local Node.js timings, not a browser or hosted-service service-level claim.
+
 ## Architecture
 
 ```text

@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+Add a deterministic synthetic benchmark generator and publish measured single-machine results with hardware, runtime and timing scope disclosed. No computation or bundle contract change.
+
 ## 0.2.1 — 2026-09-21
 
 Preview changes between the current report and a proposed analysis plan before applying it. Show setting changes, group values and, for unchanged CSV input, source-record membership changes. Explicitly mark grouping or formula changes as not directly comparable. Add a CLI comparison of two replay-verified bundles; tampered reports are refused. The published MoonBit numerical contract remains 0.2.0.

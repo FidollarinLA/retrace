@@ -18,7 +18,7 @@
 
 ## Quarterly competitiveness
 - [ ] Obtain two independent users' feedback; record authentic findings, never fabricate adoption.
-- [ ] Publish benchmark datasets and measured performance under disclosed hardware/toolchain settings.
+- [x] Publish deterministic synthetic benchmark generation and local measurements with hardware, toolchain and methodology disclosed. Browser and concurrent-load benchmarks remain open.
 - [ ] Stabilize public schema and package API based on actual reuse.
 - [ ] Expand plan operations only for observed needs, with independent numerical oracles.
 
